@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mood;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,10 +16,17 @@ class MoodController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         return Inertia::render('Moods/Index', [
-            'moods' => Mood::with('user:id,name')->latest()->get(),
+            'moods' => Mood::with('user:id,name')
+                ->latest()
+                ->where(
+                    'user_id',
+                    '=',
+                    $request->user()->id
+                )
+                ->get(),
         ]);
     }
 
